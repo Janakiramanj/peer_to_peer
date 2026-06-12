@@ -5,9 +5,14 @@ char user1[30];
 void add_user(char* user)
 {
 	char data[70] = "/tmp/conv/";
+	DIR*dr = opendir(data);
 	
-	if(opendir(data)!=NULL)
-    mkfifo(strcat(data,user),0666);
+	if(dr!=NULL)
+        mkfifo(strcat(data,user),0666);
+	else
+	    mkdir(data,0666);
+	
+	closedir(dr);
 }
 
 int check_user_availaibility(char* path)
@@ -34,19 +39,26 @@ int check_user_availaibility(char* path)
 
 void* tx(void* tmp)
 {
-	int fd;
+	int fd,c;
 	char data[70] = "/tmp/conv/";
 	char*user;
-	char* msg;
+	char msg2[100];
 	
 	tx_data* t=(tx_data*)tmp;
 	user=t->id;
-	msg=t->msg;
 	
-    fd = open(strcat(data,user),O_WRONLY);
+	fd = open(strcat(data,user),O_WRONLY);
 	
-	write(fd,msg,strlen(msg));
-	
+    while ((c = getchar()) != '\n' && c != EOF)
+	{
+	} 
+		
+	while(1){
+		fgets(msg2,100,stdin);
+		printf("\n");
+	    if((write(fd,msg2,strlen(msg2)))==0)
+			break;
+	}
 	
 	close(fd);
 	return NULL;
@@ -60,12 +72,15 @@ void* rx(void*a)
 	
     fd = open(strcat(data,user), O_RDONLY);
 	
-    i=read(fd,ch,sizeof(ch));
+	while(1){
+       i=read(fd,ch,sizeof(ch));
 	
 	if (i>0)
-	ch[i]='\0';
-
-    printf("%s:%s\n",user1,ch);
+	    ch[i]='\0';
+    else if(i==0)
+		break;
+	
+    printf("%s:%s\n",user1,ch);}
 	close(fd);
 	return NULL;
 }

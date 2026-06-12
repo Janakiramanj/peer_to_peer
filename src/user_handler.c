@@ -33,24 +33,12 @@ int main()
     if(check_user_availaibility("./data/userdata.md")){
     	tx_data tx_user;
 	    tx_user.id = user1;
-	    tx_user.msg =msg;
-		
-	int c;
-    while ((c = getchar()) != '\n' && c != EOF)
-	{
-	} 
-		
-	while(1){
-	    printf("\n%s:",a);
-
-		fgets(tx_user.msg,sizeof(msg),stdin);
 		
 	    pthread_create(&rx_th,NULL,rx,a);
         pthread_create(&tx_th,NULL,tx,&tx_user);
 		
 		pthread_join(tx_th, NULL);
 	    pthread_join(rx_th, NULL);
-	}
 
 	}
 
